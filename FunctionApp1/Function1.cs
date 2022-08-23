@@ -23,21 +23,17 @@ namespace FunctionApp1
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
 
-            //string name = req.Query["name"];
-            //string type = req.Query["type"];
 
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             var data1 = JsonConvert.DeserializeObject<List<Data>>(requestBody);
-            //name = name ?? data?.name;
-            //type = type ?? data?.type;
+            
 
             // Delete all files in a directory    
-            string[] files = Directory.GetFiles(@"G:\ZipMade\");
+            string[] files = Directory.GetFiles(@"C:\DownloadAndZip\Downloads");
             foreach (string file in files)
             {
 
                 File.Delete(file);
-                //Console.WriteLine($"{file} is deleted.");
             }
 
          
@@ -46,18 +42,17 @@ namespace FunctionApp1
 
             foreach(var file in data1)
             {
-                webClient.DownloadFile(file.url, @"G:\DownloadAndZip\"+file.Id+"."+file.type);
+                webClient.DownloadFile(file.url, @"C:\DownloadAndZip\Downloads\" + file.name+"."+file.type);
             }
 
 
-            string startpath = @"G:\DownloadAndZip\";
-            string zipPath = @"G:\ZipMade\result.zip";
+            string date = DateTime.Now.ToShortDateString();
+
+            string startpath = @"C:\DownloadAndZip\Downloads\";
+            string zipPath = @"C:\DownloadAndZip\Zip\Sharepoint_"+date+".zip";
 
             ZipFile.CreateFromDirectory(startpath, zipPath);
 
-            //string responseMessage = string.IsNullOrEmpty(name)
-            //    ? "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response."
-            //    : $"Hello, {name}. This HTTP triggered function executed successfully.";
 
             return new OkObjectResult(zipPath);
         }
